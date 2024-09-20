@@ -6,5 +6,5 @@ RUN mvn -B package -Dmaven.test.skip=true
 
 FROM openjdk:17
 WORKDIR /app
-COPY --from=builder /app/target/apple-monitor-0.0.6.jar  /app
-CMD ["java","-jar","/app/apple-monitor-0.0.6.jar"]
+COPY --from=builder /app/target/apple-monitor-0.1.1.jar  /app
+CMD ["java","-jar","/app/apple-monitor-0.1.1.jar"]
