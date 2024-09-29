@@ -22,6 +22,8 @@ public class AppleTaskConfig {
     public String location;
     public String cronExpressions;
     public String country;
+    public boolean healthCheck;
+    public int healthCheckPort;
 
     public boolean valid() {
         if (CollectionUtil.isEmpty(deviceCodeList)) {

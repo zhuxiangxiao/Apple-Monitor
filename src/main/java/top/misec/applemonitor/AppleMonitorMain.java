@@ -9,6 +9,7 @@ import cn.hutool.setting.Setting;
 import lombok.extern.slf4j.Slf4j;
 import top.misec.applemonitor.config.AppCfg;
 import top.misec.applemonitor.config.CfgSingleton;
+import top.misec.applemonitor.job.HealthCheckRunnable;
 
 /**
  * @author moshi
@@ -39,6 +40,12 @@ public class AppleMonitorMain {
             CronUtil.setCronSetting(setting);
             CronUtil.setMatchSecond(true);
             CronUtil.start(true);
+            if (appCfg.getAppleTaskConfig().healthCheck){
+                Thread serverThread = new Thread(new HealthCheckRunnable());
+                serverThread.start();
+            }
+
+
         }
 
         LOCK.lock();
