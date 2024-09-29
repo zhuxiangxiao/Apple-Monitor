@@ -18,7 +18,9 @@ public class CfgSingleton {
     private CfgSingleton() {
         String currentPath = System.getProperty("user.dir") + File.separator + "config.json";
         String configStr = FileReader.readFile(currentPath);
-
+        if (StrUtil.isBlank(configStr)){
+            configStr = System.getenv("APPLE_MONITOR_CFG");
+        }
         this.config = JSONObject.parseObject(configStr, AppCfg.class);
 
     }
@@ -30,6 +32,9 @@ public class CfgSingleton {
         }
         String currentPath = System.getProperty("user.dir") + File.separator + fileName;
         String configStr = FileReader.readFile(currentPath);
+        if (StrUtil.isBlank(configStr)){
+            configStr = System.getProperty("APPLE_MONITOR_CFG");
+        }
         this.config = JSONObject.parseObject(configStr, AppCfg.class);
     }
 
