@@ -18,6 +18,8 @@ import java.net.Socket;
  */
 @Slf4j
 public class HealthCheckRunnable implements Runnable {
+
+    private AppleMonitor appleMonitor = new AppleMonitor();
     @Override
     public void run() {
         AppCfg appCfg = CfgSingleton.getInstance().config;
@@ -39,21 +41,29 @@ public class HealthCheckRunnable implements Runnable {
             // 读取请求行
             String requestLine = in.readLine();
             if (requestLine != null && requestLine.startsWith("GET /health")) {
-                // 发送响应
-                String response = "HTTP/1.1 200 OK\r\n" +
-                        "Content-Length: 2\r\n" +
-                        "Content-Type: text/plain\r\n" +
-                        "\r\n" +
-                        "OK";
-                log.info("HealthCheck success");
-                out.write(response.getBytes());
-            } else {
-                // 发送404响应
-                String response = "HTTP/1.1 404 Not Found\r\n" +
+                if (appleMonitor.healthCheck()){
+                    // 发送响应
+                    String response = "HTTP/1.1 200 OK\r\n" +
+                            "Content-Length: 2\r\n" +
+                            "Content-Type: text/plain\r\n" +
+                            "\r\n" +
+                            "OK";
+                    log.info("HealthCheck success");
+                    out.write(response.getBytes());
+                    return;
+                }
+                // 发送500响应
+                String response = "HTTP/1.1 500 Internal Server Error\r\n" +
                         "Content-Length: 0\r\n" +
                         "\r\n";
                 out.write(response.getBytes());
+                return;
             }
+            // 发送404响应
+            String response = "HTTP/1.1 404 Not Found\r\n" +
+                    "Content-Length: 0\r\n" +
+                    "\r\n";
+            out.write(response.getBytes());
         } catch (Exception e) {
             log.error("HealthCheckRunnable error", e);
         }

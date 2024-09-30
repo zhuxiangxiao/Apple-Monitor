@@ -9,7 +9,11 @@ import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import top.misec.applemonitor.config.*;
+import top.misec.applemonitor.config.AppCfg;
+import top.misec.applemonitor.config.CfgSingleton;
+import top.misec.applemonitor.config.CountryEnum;
+import top.misec.applemonitor.config.DeviceItem;
+import top.misec.applemonitor.config.PushConfig;
 import top.misec.applemonitor.push.impl.FeiShuBotPush;
 import top.misec.applemonitor.push.pojo.feishu.FeiShuPushDTO;
 import top.misec.bark.BarkPush;
@@ -51,7 +55,7 @@ public class AppleMonitor {
 
             if (StrUtil.isAllNotEmpty(push.getBarkPushUrl(), push.getBarkPushToken())) {
                 BarkPush barkPush = new BarkPush(push.getBarkPushUrl(), push.getBarkPushToken());
-                PushDetails pushDetails= PushDetails.builder()
+                PushDetails pushDetails = PushDetails.builder()
                         .title("苹果商店监控")
                         .body(content)
                         .category("苹果商店监控")
@@ -143,6 +147,31 @@ public class AppleMonitor {
 
         } catch (Exception e) {
             log.error("AppleMonitor error", e);
+        }
+
+    }
+
+    public boolean healthCheck() {
+        List<DeviceItem> deviceItemList = CONFIG.getAppleTaskConfig().getDeviceCodeList();
+        DeviceItem deviceItem = deviceItemList.stream().findAny().orElseThrow(() -> new RuntimeException("请配置设备型号"));
+        Map<String, Object> queryMap = new HashMap<>(5);
+        queryMap.put("pl", "true");
+        queryMap.put("mts.0", "regular");
+        queryMap.put("parts.0", deviceItem.getDeviceCode());
+        queryMap.put("location", CONFIG.getAppleTaskConfig().getLocation());
+
+        String baseCountryUrl = CountryEnum.getUrlByCountry(CONFIG.getAppleTaskConfig().getCountry());
+
+        Map<String, List<String>> headers = buildHeaders(baseCountryUrl, deviceItem.getDeviceCode());
+
+        String url = baseCountryUrl + "/shop/fulfillment-messages?" + URLUtil.buildQuery(queryMap, CharsetUtil.CHARSET_UTF_8);
+
+        try {
+            HttpResponse httpResponse = HttpRequest.get(url).header(headers).execute();
+            return httpResponse.isOk();
+        } catch (Exception e) {
+            log.error("AppleMonitor error", e);
+            return false;
         }
 
     }
