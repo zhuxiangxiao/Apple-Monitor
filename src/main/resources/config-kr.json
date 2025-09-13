@@ -1,15 +1,14 @@
 {
   "appleTaskConfig": {
     "cronExpressions": "*/12 * * * * ?",
-    "country": "JP",
-    "location": "197-0804",
+    "country": "KR",
+    "location": "01000",
     "deviceCodeList": [
       {
-        "deviceCode": "MYWG3J/A",
+        "deviceCode": "MYX53KH/A",
         "storeWhiteList": [
-          "新宿",
-          "名古屋栄",
-          "銀座"
+          "여의도",
+          "가로수길"
         ],
         "pushConfigs": [
           {
@@ -22,11 +21,10 @@
         ]
       },
       {
-        "deviceCode": "MYWH3J/A",
+        "deviceCode": "MYX73KH/A",
         "storeWhiteList": [
-          "新宿",
-          "名古屋栄",
-          "銀座"
+          "여의도",
+          "가로수길"
         ],
         "pushConfigs": [
           {
